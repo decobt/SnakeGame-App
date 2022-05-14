@@ -6,106 +6,205 @@
  * @flow strict-local
  */
 
-import React from 'react';
-import type {Node} from 'react';
+import React, { Component } from 'react';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 import {
   SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
-  useColorScheme,
+  TouchableOpacity,
   View,
+  FlatList,
+  Dimensions
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const windowWidth = Dimensions.get('window').width;
 
-const Section = ({children, title}): Node => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+function Block({item, snake, meal}){
+  let color = 'transparent';
+
+  if( snake.includes( item.key ) ){
+    color = '#fbc900';
+  }
+
+  if( meal == item.key ){
+    color = '#fe3d3d';
+  }
+
+  return(
+    <View style={[ { backgroundColor: color }, styles.item]}>
+      <Text style={styles.title}>{ /* item.key */ }</Text>
     </View>
   );
-};
+}
 
-const App: () => Node = () => {
-  const isDarkMode = useColorScheme() === 'dark';
+class App extends Component {
+  constructor(props) {
+    super(props);
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+    this.state = {
+      gridList: Array.from(Array(300), (x,index)=>{ a=index; index++; return {key: a};}),
+      snake: [0,1,2,3],
+      meal: 500,
+      direction: 'right',
+      start: false,
+    };
+  }
 
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+  chooseMeal() {
+    const { snake } = this.state;
+    do {
+      meal = Math.floor(Math.random() * 300); // pick a random position, 0 to 300
+    } while ( snake.includes( meal ));
+
+    return meal;
+  }
+
+  toggleGameStatus() {
+    const { start, meal } = this.state;
+    if(start == false){
+      this.setState({ start: true, meal: this.chooseMeal() });
+
+      interval = setInterval(() => {
+        this.takeStep();
+      }, 300);
+    }else{
+      clearInterval(interval);
+      this.setState({ start: false });
+    }
+  }
+
+  takeStep(){
+    const { snake, direction } = this.state;
+    snake.shift();
+    let latest = snake[snake.length - 1];
+
+    switch(direction){
+      case 'right': { latest = latest + 1; break; }
+      case 'left': { latest = latest - 1; break; }
+      case 'down': { 
+        latest = latest + 15;
+        if(latest > 300){
+          latest = latest - 300;
+        } 
+        break; }
+      case 'up': { 
+        latest = latest - 15; 
+        if(latest < 0){
+          latest = latest + 300;
+        } 
+        break; }
+    }
+
+    snake.push( latest );
+    this.setState({ snake: snake });
+  }
+
+  moveLeft(){
+    this.setState({ direction: 'left'});
+  }
+
+  moveRight(){
+    this.setState({ direction: 'right'});
+  }
+
+  moveDown(){
+    this.setState({ direction: 'down'});
+  }
+
+  moveUp(){
+    this.setState({ direction: 'up'});
+  }
+
+  render() {
+    const { gridList, snake, meal } = this.state;
+
+    return (
+      <SafeAreaView style={styles.container}>
+        
+        <FlatList
+            style={styles.grid}
+            data={gridList}
+            renderItem={({ item }) => (<Block item={item} snake={snake} meal={meal} />)}
+            keyExtractor={item => item.key}
+            numColumns={15}
+            refreshing={false}
+        />
+
+        <View style={styles.btnContainer}>
+          <TouchableOpacity onPress={this.moveUp.bind(this)}>
+            <View style={styles.button}>
+              <Icon name="arrow-up" size={32} color="#d6d6d6" />
+            </View>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-};
+
+        <View style={[ styles.btnContainer, {justifyContent: 'center'} ]}>
+          <TouchableOpacity onPress={this.moveLeft.bind(this)}>
+            <View style={[ styles.button, {marginLeft: 10, marginRight: 10} ]}>
+              <Icon name="arrow-left" size={26} color="#d6d6d6" />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={this.toggleGameStatus.bind(this)}>
+            <View style={[ styles.button, {marginLeft: 10, marginRight: 10} ]}>
+              <Icon name="play" size={30} color="#d6d6d6" />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={this.moveRight.bind(this)}>
+            <View style={[ styles.button, {marginLeft: 10, marginRight: 10} ]}>
+              <Icon name="arrow-right" size={26} color="#d6d6d6" />
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.btnContainer}>
+          <TouchableOpacity onPress={this.moveDown.bind(this)}>
+            <View style={styles.button}>
+              <Icon name="arrow-down" size={32} color="#d6d6d6" />
+            </View>
+          </TouchableOpacity>
+        </View>
+      
+      </SafeAreaView>
+    );
+  }
+}
+
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    backgroundColor: '#00b2b5',
+    height: '100%'
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  item: {
+    height: (windowWidth-90)/15,
+    width: (windowWidth-90)/15,
+    margin: 2,
+    borderRadius: (windowWidth-90)/15
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  grid: {
+    margin: 10,
+    padding: 0,
+    borderWidth: 4,
+    borderColor: '#029093',
+    backgroundColor: '#00a2a5',
   },
-  highlight: {
-    fontWeight: '700',
+  btnContainer:{
+    flex: 1,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+    textAlign: 'center'
+  },
+  button:{
+    backgroundColor: '#112d4e',
+    padding: 10,
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+    textAlign: 'center',
   },
 });
 
