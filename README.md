@@ -10,6 +10,10 @@ The rules for snake are very simple. Use the navigation buttons to change the di
 
 - [@decobt](https://www.github.com/decobt)
 
+  
+### Screenshots
+
+![App Screenshot](https://raw.githubusercontent.com/decobt/SnakeGame-App/master/screenshots/image1.jpg)
 
 
 ### To Do / Known bugs
