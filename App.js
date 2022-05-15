@@ -23,17 +23,18 @@ const windowWidth = Dimensions.get('window').width;
 
 function Block({item, snake, meal}){
   let color = 'transparent';
-
+  let radius = 4;
   if( snake.includes( item.key ) ){
-    color = '#fbc900';
+    color = '#371832';
   }
 
   if( meal == item.key ){
-    color = '#fe3d3d';
+    color = '#e33b2e';
+    radius = (windowWidth-130)/15;
   }
 
   return(
-    <View style={[ { backgroundColor: color }, styles.item]}>
+    <View style={[ styles.item, { backgroundColor: color, borderRadius:radius }]}>
       <Text style={styles.title}>{ /* item.key */ }</Text>
     </View>
   );
@@ -123,6 +124,7 @@ class App extends Component {
     return (
       <SafeAreaView style={styles.container}>
         
+        <View style={styles.gridContainer}>
         <FlatList
             style={styles.grid}
             data={gridList}
@@ -131,10 +133,11 @@ class App extends Component {
             numColumns={15}
             refreshing={false}
         />
+        </View>
 
         <View style={styles.btnContainer}>
           <TouchableOpacity onPress={this.moveUp.bind(this)}>
-            <View style={styles.button}>
+            <View style={styles.buttonRed}>
               <Icon name="arrow-up" size={32} color="#d6d6d6" />
             </View>
           </TouchableOpacity>
@@ -142,30 +145,30 @@ class App extends Component {
 
         <View style={[ styles.btnContainer, {justifyContent: 'center'} ]}>
           <TouchableOpacity onPress={this.moveLeft.bind(this)}>
-            <View style={[ styles.button, {marginLeft: 10, marginRight: 10} ]}>
-              <Icon name="arrow-left" size={26} color="#d6d6d6" />
+            <View style={[ styles.buttonRed, {marginLeft: 10, marginRight: 10} ]}>
+              <Icon name="arrow-left" size={30} color="#d6d6d6" />
             </View>
           </TouchableOpacity>
           <TouchableOpacity onPress={this.toggleGameStatus.bind(this)}>
-            <View style={[ styles.button, {marginLeft: 10, marginRight: 10} ]}>
-              <Icon name="play" size={30} color="#d6d6d6" />
+            <View style={[ styles.buttonGreen, {marginLeft: 10, marginRight: 10} ]}>
+              <Icon name="play" size={30} color="#312849" style={{marginLeft: 5}} />
             </View>
           </TouchableOpacity>
           <TouchableOpacity onPress={this.moveRight.bind(this)}>
-            <View style={[ styles.button, {marginLeft: 10, marginRight: 10} ]}>
-              <Icon name="arrow-right" size={26} color="#d6d6d6" />
+            <View style={[ styles.buttonRed, {marginLeft: 10, marginRight: 10} ]}>
+              <Icon name="arrow-right" size={30} color="#d6d6d6" />
             </View>
           </TouchableOpacity>
         </View>
 
         <View style={styles.btnContainer}>
           <TouchableOpacity onPress={this.moveDown.bind(this)}>
-            <View style={styles.button}>
+            <View style={styles.buttonRed}>
               <Icon name="arrow-down" size={32} color="#d6d6d6" />
             </View>
           </TouchableOpacity>
         </View>
-      
+
       </SafeAreaView>
     );
   }
@@ -174,21 +177,33 @@ class App extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#00b2b5',
+    backgroundColor: '#4a426b',
     height: '100%'
+  },
+  containerInner: {
+    backgroundColor: '#4a426b',
+    height: '90%'
   },
   item: {
     height: (windowWidth-90)/15,
-    width: (windowWidth-90)/15,
-    margin: 2,
-    borderRadius: (windowWidth-90)/15
+    width: (windowWidth-130)/15,
+    margin: 2
+  },
+  gridContainer: {
+    borderWidth: 4,
+    margin: 20,
+    borderColor: '#31988b',
+    borderRadius: 10
   },
   grid: {
-    margin: 10,
     padding: 0,
-    borderWidth: 4,
-    borderColor: '#029093',
-    backgroundColor: '#00a2a5',
+    borderWidth: 10,
+    borderRadius:10,
+    backgroundColor: '#fbc900',
+    borderBottomColor: '#736bac',
+    borderTopColor: '#312849',
+    borderLeftColor: '#42426b',
+    borderRightColor: '#42426b'
   },
   btnContainer:{
     flex: 1,
@@ -198,13 +213,29 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center'
   },
-  button:{
-    backgroundColor: '#112d4e',
+  buttonRed:{
+    backgroundColor: '#ef6b5a',
     padding: 10,
     width: 50,
     height: 50,
     borderRadius: 50,
     textAlign: 'center',
+    shadowColor: '#e33b2e',
+    shadowOffset: {width: 0, height: 3},
+    shadowOpacity: 1,
+    shadowRadius: 2,
+  },
+  buttonGreen:{
+    backgroundColor: '#00e7ad',
+    padding: 10,
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+    textAlign: 'center',
+    shadowColor: '#0d8a6f',
+    shadowOffset: {width: 0, height: 3},
+    shadowOpacity: 1,
+    shadowRadius: 2,
   },
 });
 
