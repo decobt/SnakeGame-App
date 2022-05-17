@@ -1,6 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
+ * Snake Game App
  *
  * @format
  * @flow strict-local
@@ -77,10 +76,10 @@ class App extends Component {
   }
 
   takeStep(){
-    const { snake, direction } = this.state;
-    snake.shift();
+    const { snake, direction, meal } = this.state;
     let latest = snake[snake.length - 1];
 
+    //move the snake by one place
     switch(direction){
       case 'right': { latest = latest + 1; break; }
       case 'left': { latest = latest - 1; break; }
@@ -98,8 +97,22 @@ class App extends Component {
         break; }
     }
 
-    snake.push( latest );
-    this.setState({ snake: snake });
+    //check if snake has hit itself
+    if(snake.includes( latest )){
+      this.setState({ start: false, snake: [], meal:500 });
+    }else{
+      //if not update the snake with another block
+      snake.push( latest );
+
+      //calculate if meal is reached
+      if(latest!=meal){
+        snake.shift();
+      }else{
+        this.setState({ meal: this.chooseMeal() });
+      }
+  
+      this.setState({ snake: snake });
+    }
   }
 
   moveLeft(){
