@@ -49,6 +49,7 @@ class App extends Component {
       meal: 500,
       direction: 'right',
       start: false,
+      score: 0
     };
   }
 
@@ -76,7 +77,7 @@ class App extends Component {
   }
 
   takeStep(){
-    const { snake, direction, meal } = this.state;
+    const { snake, direction, meal, score } = this.state;
     let latest = snake[snake.length - 1];
 
     //move the snake by one place
@@ -108,7 +109,7 @@ class App extends Component {
       if(latest!=meal){
         snake.shift();
       }else{
-        this.setState({ meal: this.chooseMeal() });
+        this.setState({ meal: this.chooseMeal(), score: score+1 });
       }
   
       this.setState({ snake: snake });
@@ -132,11 +133,12 @@ class App extends Component {
   }
 
   render() {
-    const { gridList, snake, meal } = this.state;
+    const { gridList, snake, meal, score } = this.state;
 
     return (
       <SafeAreaView style={styles.container}>
         
+        <Text style={styles.text}>Your score: {score}</Text>
         <View style={styles.gridContainer}>
         <FlatList
             style={styles.grid}
@@ -201,6 +203,10 @@ const styles = StyleSheet.create({
     height: (windowWidth-90)/15,
     width: (windowWidth-130)/15,
     margin: 2
+  },
+  text: {
+    textAlign: 'center',
+    color: '#fff'
   },
   gridContainer: {
     borderWidth: 4,
